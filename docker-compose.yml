@@ -29,4 +29,14 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     networks:
       - internal-network
+
+
+networks:
+  internal-network:
+    driver: bridge
+    name: internal-network
+
+volumes:
+  postgres:
+  pgadmin:
 ---
