@@ -1,0 +1,32 @@
+---
+
+version: "2.22"
+
+services:
+  #DB
+  postgres:
+    image: postgres:10-alpine
+    build: ./docker/postgres
+    hostname: ${POSTGRES_PORT}
+    ports:
+      - "${POSTGRES_POST}:${POSTGRES_PORT}"
+    volumes:
+      -
+    command: postgres -c 'max_connections=500'
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    networks:
+      - internal-network
+
+  #DBManager
+  pgadmin:
+    image: page/pgadmin4:8.11.0
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@test.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    networks:
+      - internal-network
+---

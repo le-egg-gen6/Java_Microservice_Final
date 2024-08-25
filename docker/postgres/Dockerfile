@@ -1,4 +1,4 @@
-FROM postgres:10-alpine
+FROM debezium/postgres:10-alpine
 
 ENV POSTGRES_DB=keycloak
 ENV POSTGRES_USER=keycloak
