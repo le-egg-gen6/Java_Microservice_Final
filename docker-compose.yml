@@ -7,7 +7,7 @@ services:
   postgres:
     image: postgres:10-alpine
     build: ./docker/postgres
-    hostname: ${POSTGRES_PORT}
+    hostname: ${POSTGRES_HOST}
     ports:
       - "${POSTGRES_POST}:${POSTGRES_PORT}"
     volumes:
@@ -30,6 +30,52 @@ services:
     networks:
       - internal-network
 
+  #ZooKeeper
+  zookeeper:
+    image: debezium/zookeeper:2.2
+    restart: always
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+    networks:
+      - internal-network
+
+  #Apache Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.4.3
+    hostname: ${KAFKA_SERVICE_HOST}
+    ports:
+      - ${KAFKA_SERVICE_PORT}:${KAFKA_SERVICE_PORT}
+      - 29092:29092
+    environment:
+      - KAFKA_BROKER_ID
+      - KAFKA_ZOOKEEPER_CONNECT
+      - KAFKA_ADVERTISED_LISTENERS
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+      - KAFKA_INTER_BROKER_LISTENER_NAME
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+    depends_on:
+      - zookeeper
+    networks:
+      - internal-network
+
+  #Kafka Connector
+  kafka-connect:
+    image: debezium/connect:2.2
+    restart: always
+    ports:
+      - 8083:8083
+      - 5005:5005
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=kafka_connect_configs
+      - OFFSET_STORAGE_TOPIC=kafka_connect_offsets
+    depends_on:
+      - kafka
+    networks:
+      - internal-network
 
 networks:
   internal-network:
