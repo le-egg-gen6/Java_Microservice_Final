@@ -77,6 +77,27 @@ services:
     networks:
       - internal-network
 
+  #Apache Kafka HQ
+  akhq:
+    image: tchiotludo/akhq:0.25.0
+    ports:
+      - 8089:8080
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "kafka:9092"
+              connect:
+                - name: "kafka-connect"
+                  url: "http://kafka-connect:8083"
+    depends_on:
+      - kafka
+      - kafka-connect
+    networks:
+      - internal-network
+
 networks:
   internal-network:
     driver: bridge
