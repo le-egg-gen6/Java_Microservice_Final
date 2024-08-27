@@ -3,6 +3,19 @@
 version: "2.22"
 
 services:
+  #Nginx
+  nginx:
+    image: nginx:1.25.5-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/config/custom_proxy_settings.conf:/etc/nginx/conf.d/custom_proxy_settings.conf
+      - ./nginx/templates:/etc/nginx/templates
+    networks:
+      - internal-network
+
+
   #DB
   postgres:
     image: postgres:10-alpine
